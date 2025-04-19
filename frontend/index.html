@@ -6,26 +6,33 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- fixed top‑right title -->
-  <header class="site-header">Mind Matter</header>
+  <header class="site-header">
+    <a href="#" id="homeLink">Mind Matter</a>
+  </header>
 
   <!-- SCREEN 1: Welcome / Selection -->
   <div id="selectionScreen" class="screen">
-    <h2 class="welcome">Welcome to <span class="teal">Adler</span></h2>
+    <h2 class="welcome">
+      Welcome to <span class="teal">Adler</span>,
+    </h2>
     <p class="subtitle">
       Adler is a virtual therapist, powered by AI, that is here to help you.
     </p>
-    <div class="btn-group">
-      <button id="soloBtn">Solo Session</button>
-      <button id="dualBtn">Dual Session</button>
+    <div class="selection-grid">
+      <div class="selection-card" id="soloCard">
+        <button id="soloBtn">Solo Session</button>
+      </div>
+      <div class="selection-card" id="dualCard">
+        <button id="dualBtn">Dual Session</button>
+      </div>
     </div>
   </div>
 
   <!-- SCREEN 2: Enter Name & Age -->
   <div id="infoScreen" class="screen" style="display:none;">
     <h2 id="infoTitle"></h2>
-    <input type="text" id="nameInput" placeholder="Your Name" />
-    <input type="number" id="ageInput" placeholder="Your Age" min="1" />
+    <input type="text"   id="nameInput" placeholder="Your Name" />
+    <input type="number" id="ageInput"  placeholder="Your Age"  min="1" />
     <button id="infoNextBtn">Next</button>
   </div>
 
@@ -35,8 +42,10 @@
     <h2 id="sessionTitle"></h2>
     <div id="chatLog" class="chat-log"></div>
     <div class="input-area">
-      <textarea id="inputA" placeholder="Your message…"></textarea>
-      <button id="sendBtn">Send</button>
+      <div class="textarea-container">
+        <textarea id="inputA" placeholder="Your message…"></textarea>
+        <button id="sendIcon" class="send-icon">➤</button>
+      </div>
       <button id="finishBtn">Finish</button>
     </div>
   </div>
@@ -45,9 +54,13 @@
   <div id="reportScreen" class="screen" style="display:none;">
     <h2>Therapy Report</h2>
     <div id="reportLog" class="report-box"></div>
-    <button id="newSessionBtn">New Session</button>
+    <div class="report-buttons">
+      <button id="downloadBtn">Download PDF</button>
+      <button id="newSessionBtn">New Session</button>
+    </div>
   </div>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="script.js"></script>
 </body>
 </html>

@@ -1,139 +1,181 @@
-/* body + fixed header */
+/* BODY + HEADER */
 body {
     margin: 0;
-    padding-top: 60px; /* space for header */
-    background: #e0f2f1; /* light teal */
+    padding-top: 100px;
+    background: #cde5e4; /* consistent light‑teal */
     font-family: Arial, sans-serif;
     display: flex;
     justify-content: center;
   }
-  
-  /* site header: top‑right, bigger, bold, teal */
   .site-header {
     position: fixed;
-    top: 0;
-    left: 50%;
+    top: 20px; left: 50%;
     transform: translateX(-50%);
-    padding: 0.5rem 1rem;
-    font-size: 3rem;
-    font-weight: bold;
-    color: teal;
-    
     z-index: 1000;
   }
+  .site-header a {
+    text-decoration: none;
+    color: #fff;
+    font-size: 3rem;
+    font-weight: bold;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+  }
   
-  /* container “card” — made wider */
+  /* SCREEN CONTAINER */
   .screen {
     background: #fff;
     width: 95%;
-    max-width: 1000px;   /* increased from 800px */
+    max-width: 1000px;
     margin: 2rem auto;
     padding: 1.5rem;
     box-shadow: 0 2px 8px rgba(0,0,0,0.2);
     border-radius: 8px;
   }
   
-  /* Welcome screen text */
-  .welcome {
-    color: #333;
-    font-size: 2rem;
-    margin-bottom: 0.5rem;
-  }
-  .subtitle {
-    color: #666;
-    font-size: 1rem;
-    margin-bottom: 1.5rem;
-  }
-  .teal { color: teal; }
+  /* WELCOME TEXT */
+  .welcome { color: #333; font-size: 2rem; margin-bottom: .5rem; }
+  .subtitle { color: #666; font-size: 1rem; margin-bottom: 1.5rem; }
+  .teal    { color: teal; }
   
-  .btn-group button {
-    background: #008080;
-    color: #fff;
-    border: none;
-    border-radius: 4px;
-    padding: 0.6rem 1rem;
-    cursor: pointer;
-    font-size: 1rem;
-    margin-right: 0.5rem;
-  }
-  .btn-group button:hover {
-    background: #006766;
-  }
-  
-  /* Back button */
-  .back-btn {
-    background: #fff;
-    color: #008080;
-    border: 1px solid #008080;
-    margin-bottom: 1rem;
-  }
-  
-  /* Inputs & textareas */
-  input, textarea {
-    width: 100%;
-    padding: 0.6rem;
-    margin: 0.5rem 0;
-    font-size: 1rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-  }
-  
-  /* Chat log box */
-  .chat-log {
-    background: #f4f4f4;
-    padding: 1rem;
-    height: 300px;
-    overflow-y: auto;
-    overflow-x: hidden;      /* prevent horizontal scroll */
-    margin-bottom: 1rem;
-    border-radius: 4px;
-  }
-  
-  /* Report box: vertical‐only scroll */
-  .report-box {
-    background: #f4f4f4;
-    padding: 1rem;
-    height: 400px;
-    overflow-y: auto;
-    overflow-x: hidden;      /* lock horizontal */
-    white-space: pre-wrap;   /* wrap long lines */
-    border-radius: 4px;
-    margin-bottom: 1rem;
-  }
-  
-  /* Chat entries */
-  .chat-msg {
-    margin: 0.5rem 0;
-  }
-  .chat-msg strong {
-    font-weight: bold;
-  }
-  .user-msg strong {
-    color: teal;
-  }
-  .adler-msg strong {
-    color: black;
-  }
-  
-  /* Chat input area */
-  .input-area {
+  /* SELECTION GRID */
+  .selection-grid {
     display: flex;
-    flex-direction: column;
+    justify-content: center;
+    gap: 2rem;
+    margin-top: 2rem;
   }
-  .input-area textarea {
-    height: 70px;
-    resize: vertical;
+  .selection-card {
+    width: 330px; height: 330px;
+    background: #f9f9f9;
+    border-radius: 20px;
+    position: relative;
+    display: flex; align-items: center; justify-content: center;
+    background-repeat: no-repeat;
+    background-position: center 30px;
+    background-size: 200px;
+    overflow: hidden;
+    transition: box-shadow .2s;
   }
-  .input-area button {
-    background: #008080;
-    color: #fff;
-    border: none;
-    border-radius: 4px;
-    padding: 0.6rem 1rem;
+  .selection-card:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  }
+  #soloCard { background-image: url('images/one-person.jpg'); }
+  #dualCard { background-image: url('images/two-person.jpg'); }
+  
+  .selection-card button {
+    position: absolute; bottom: 20px;
+    background: #4f9999; color: #fff;
+    border: none; border-radius: 6px;
+    padding: .6rem 1.2rem; font-size: 1.05rem;
+    font-weight: 500; cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    transition: transform .2s, background .2s;
+  }
+  .selection-card button:hover {
+    background: #2e7c7c;
+    transform: scale(1.05);
+  }
+  
+  /* INFO SCREEN “Next” */
+  #infoNextBtn {
+    background: #008080; color: #fff;
+    border: none; border-radius: 4px;
+    padding: .8rem 1rem; font-size: 1rem;
+    cursor: pointer; margin-top: 1rem;
+  }
+  #infoNextBtn:hover { background: #006766; }
+  
+  /* BACK BUTTON */
+  .back-btn {
+    background: #fff; color: #008080;
+    border: 1px solid #008080; border-radius: 4px;
+    padding: .4rem .8rem; margin-bottom: 1rem;
     cursor: pointer;
-    font-size: 1rem;
-    margin-top: 0.5rem;
   }
-  .input-area button:hover {
-    background: #006766;
+  .back-btn:hover { background: #f0f0f0; }
+  
+  /* INPUT STYLES */
+  input, textarea {
+    width: 100%; padding: .6rem; margin: .5rem 0;
+    font-size: 1rem; border: 1px solid #ccc;
+    border-radius: 4px;
   }
+  
+  /* CHAT LOG BUBBLES */
+  .chat-log {
+    display: flex; flex-direction: column; gap: .5rem;
+    margin-bottom: 1rem; max-height: 300px; overflow-y: auto;
+  }
+  .chat-msg {
+    max-width: 70%; padding: .75rem 1rem; border-radius: 12px;
+    line-height: 1.4; word-break: break-word;
+    position: relative;
+  }
+  .adler-msg {
+    align-self: flex-start;
+    background: #f4f4f4; color: #000;
+  }
+  .user-msg {
+    align-self: flex-end;
+    background: #008080; color: #fff;
+  }
+  
+  /* INPUT AREA & SEND ICON */
+  .input-area {
+    display: flex; flex-direction: column; gap: .75rem;
+  }
+  .textarea-container {
+    position: relative;
+  }
+  .send-icon {
+    position: absolute;
+    bottom: 12px; right: 12px;
+    background: none; border: none;
+    color: #666; font-size: 1.2rem;
+    cursor: pointer;
+    opacity: .7;
+    transition: opacity .2s;
+  }
+  .send-icon:hover { opacity: 1; }
+  
+  .input-area button {
+    background: #008080; color: #fff;
+    border: none; border-radius: 4px;
+    padding: .75rem; font-size: 1rem; cursor: pointer;
+  }
+  .input-area button:hover { background: #006766; }
+  
+  /* REPORT BOX */
+  .report-box {
+    background: #f4f4f4; padding: 1rem;
+    max-height: 400px; overflow-y: auto;
+    white-space: pre-wrap; border-radius: 4px;
+    margin-bottom: 1rem;
+  }
+  /* Bold headers, clean lists */
+  .report-box h3 {
+    margin: 1rem 0 .5rem;
+    font-size: 1.25rem; font-weight: bold;
+    color: #00695c;
+  }
+  .report-box p {
+    margin: .5rem 0; line-height: 1.5; color: #333;
+  }
+  .report-box ol {
+    margin: .5rem 0 1rem 1.5rem;
+  }
+  .report-box li {
+    margin: .4rem 0; line-height: 1.5;
+  }
+  
+  /* REPORT BUTTONS */
+  .report-buttons {
+    display: flex; gap: 1rem;
+  }
+  .report-buttons button {
+    background: #008080; color: #fff;
+    border: none; border-radius: 4px;
+    padding: .75rem 1rem; font-size: 1rem;
+    cursor: pointer; transition: background .2s;
+  }
+  .report-buttons button:hover { background: #006766; }

@@ -1,6 +1,4 @@
-// frontend/script.js
-
-// --- element refs ---
+// element refs
 const selScreen    = document.getElementById('selectionScreen');
 const infoScreen   = document.getElementById('infoScreen');
 const chatScreen   = document.getElementById('chatScreen');
@@ -8,6 +6,7 @@ const reportScreen = document.getElementById('reportScreen');
 
 const soloBtn      = document.getElementById('soloBtn');
 const dualBtn      = document.getElementById('dualBtn');
+const homeLink     = document.getElementById('homeLink');
 const infoTitle    = document.getElementById('infoTitle');
 const nameInput    = document.getElementById('nameInput');
 const ageInput     = document.getElementById('ageInput');
@@ -17,239 +16,210 @@ const backBtn      = document.getElementById('backBtn');
 const sessionTitle = document.getElementById('sessionTitle');
 const chatLog      = document.getElementById('chatLog');
 const inputA       = document.getElementById('inputA');
-const sendBtn      = document.getElementById('sendBtn');
+const sendIcon     = document.getElementById('sendIcon');
 const finishBtn    = document.getElementById('finishBtn');
 
 const reportLog     = document.getElementById('reportLog');
+const downloadBtn   = document.getElementById('downloadBtn');
 const newSessionBtn = document.getElementById('newSessionBtn');
 
-// --- state ---
-let sessionType     = null;    // 'individual' or 'dual'
-let stage           = null;    // 'infoSolo','chatSolo','infoA','chatA','infoB','chatB'
-let nameSolo, ageSolo, historySolo = [];
-let nameA, ageA, historyA         = [];
-let nameB, ageB, historyB         = [];
+// state
+let sessionType, stage;
+let nameSolo, ageSolo, historySolo;
+let nameA, ageA, historyA;
+let nameB, ageB, historyB;
 
-// show only one screen
-function showScreen(scr) {
+// switch screens
+function showScreen(s) {
   [selScreen, infoScreen, chatScreen, reportScreen]
-    .forEach(s => s.style.display = (s === scr ? 'block' : 'none'));
+    .forEach(x => x.style.display = x===s ? 'block' : 'none');
 }
-
-// initial
 showScreen(selScreen);
 
-/**
- * Very simple MD‑to‑HTML:
- *  - strips leading # from headings
- *  - converts numbered list lines to <ol><li>…</li></ol>
- *  - wraps other lines in <p>
- */
+// MD→HTML with real headers
 function renderReport(md) {
-  const lines = md.split('\n').filter(l => l.trim() !== '');
-  const items = [];
-  const htmlParts = [];
+  const lines = md.split('\n').filter(l => l.trim());
+  const items = [], html = [];
 
-  lines.forEach(line => {
-    // numbered list?
-    const numMatch = line.match(/^(\d+)\.\s+(.*)/);
+  lines.forEach(l => {
+    const hMatch = l.match(/^#+\s+(.*)/);
+    if (hMatch) {
+      html.push(`<h3>${hMatch[1]}</h3>`);
+      return;
+    }
+    const numMatch = l.match(/^(\d+)\.\s+(.*)/);
     if (numMatch) {
       items.push(numMatch[2]);
       return;
     }
-    // flush any collected <li> items
     if (items.length) {
-      htmlParts.push(
-        '<ol>' +
-          items.map(i => `<li>${i}</li>`).join('') +
-        '</ol>'
-      );
+      html.push('<ol>' + items.map(i=>`<li>${i}</li>`).join('') + '</ol>');
       items.length = 0;
     }
-    // strip MD header markers
-    const text = line.replace(/^#+\s*/, '');
-    htmlParts.push(`<p>${text}</p>`);
+    html.push(`<p>${l}</p>`);
   });
-
-  // flush at end
   if (items.length) {
-    htmlParts.push(
-      '<ol>' +
-        items.map(i => `<li>${i}</li>`).join('') +
-      '</ol>'
-    );
+    html.push('<ol>' + items.map(i=>`<li>${i}</li>`).join('') + '</ol>');
   }
 
-  return htmlParts.join('');
+  return html.join('');
 }
 
-// ─── SELECTION ───────────────────────────────
-soloBtn.addEventListener('click', () => {
-  sessionType = 'individual';
-  stage       = 'infoSolo';
-  infoTitle.textContent    = 'Solo Session — Your Info';
-  nameInput.value = ageInput.value = '';
-  showScreen(infoScreen);
-});
-dualBtn.addEventListener('click', () => {
-  sessionType = 'dual';
-  stage       = 'infoA';
-  infoTitle.textContent    = 'Dual Session — User A Info';
-  nameInput.value = ageInput.value = '';
-  showScreen(infoScreen);
-});
-
-// ─── INFO → CHAT ─────────────────────────────
-infoNextBtn.addEventListener('click', () => {
-  const nm = nameInput.value.trim();
-  const ag = ageInput.value.trim();
-  if (!nm || !ag) return alert('Please enter name & age.');
-
-  if (stage === 'infoSolo') {
-    nameSolo   = nm; ageSolo   = ag; historySolo = [];
-    stage      = 'chatSolo';
-  } else if (stage === 'infoA') {
-    nameA      = nm; ageA      = ag; historyA    = [];
-    stage      = 'chatA';
-  } else if (stage === 'infoB') {
-    nameB      = nm; ageB      = ag; historyB    = [];
-    stage      = 'chatB';
-  }
-
-  const title =
-    stage === 'chatSolo' ? `Solo Session for ${nameSolo}` :
-    stage === 'chatA'    ? `Session — ${nameA}` :
-                           `Session — ${nameB}`;
-  sessionTitle.textContent = title;
-  chatLog.textContent      = '';
-  inputA.value             = '';
-  showScreen(chatScreen);
-});
-
-// ─── HELPERS FOR MESSAGES ─────────────────────
-function addUserMessage(text) {
-  const userName =
-    stage === 'chatSolo' ? nameSolo :
-    stage === 'chatA'    ? nameA   :
-                           nameB;
+// add message
+function addMsg(text, isUser) {
   const p = document.createElement('p');
-  p.className = 'chat-msg user-msg';
-  const strong = document.createElement('strong');
-  strong.textContent = `${userName}: `;
-  p.appendChild(strong);
-  p.appendChild(document.createTextNode(text));
+  p.className = `chat-msg ${isUser?'user-msg':'adler-msg'}`;
   chatLog.appendChild(p);
-  chatLog.scrollTop = chatLog.scrollHeight;
-}
 
-function addAdlerMessage(text) {
-  const p = document.createElement('p');
-  p.className = 'chat-msg adler-msg';
-  const strong = document.createElement('strong');
-  strong.textContent = 'Adler: ';
-  p.appendChild(strong);
-  chatLog.appendChild(p);
-  chatLog.scrollTop = chatLog.scrollHeight;
-
-  let i = 0;
-  const iv = setInterval(() => {
-    p.appendChild(document.createTextNode(text.charAt(i)));
+  // typewriter animation for Adler
+  if (!isUser) {
+    let i=0;
+    const iv = setInterval(()=>{
+      p.textContent += text.charAt(i);
+      chatLog.scrollTop = chatLog.scrollHeight;
+      i++;
+      if (i>=text.length) clearInterval(iv);
+    },20);
+  } else {
+    p.textContent = text;
     chatLog.scrollTop = chatLog.scrollHeight;
-    i++;
-    if (i >= text.length) clearInterval(iv);
-  }, 20);
+  }
 }
 
-// ─── CHAT “SEND” ─────────────────────────────
-sendBtn.addEventListener('click', async () => {
+// send logic
+async function sendMessage() {
   const msg = inputA.value.trim();
-  if (!msg) return alert('Type a message first.');
-  inputA.value = '';
+  if (!msg) return;
+  inputA.value='';
 
-  addUserMessage(msg);
-  if (stage === 'chatSolo') historySolo.push({ role:'user', content: msg });
-  else if (stage === 'chatA') historyA.push({ role:'user', content: msg });
-  else if (stage === 'chatB') historyB.push({ role:'user', content: msg });
+  addMsg(msg, true);
+  if (stage==='chatSolo') historySolo.push({role:'user',content:msg});
+  else if (stage==='chatA') historyA.push({role:'user',content:msg});
+  else                historyB.push({role:'user',content:msg});
 
   try {
-    const res = await fetch('http://localhost:3000/api/chat', {
-      method: 'POST',
-      headers:{ 'Content-Type':'application/json' },
+    const res = await fetch('http://localhost:3000/api/chat',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
       body: JSON.stringify({
         sessionType,
-        name: stage==='chatSolo' ? nameSolo : (stage==='chatA'?nameA:nameB),
-        age:  stage==='chatSolo' ? ageSolo  : (stage==='chatA'?ageA:ageB),
-        inputs: [ msg ]
+        name: stage==='chatSolo'?nameSolo:(stage==='chatA'?nameA:nameB),
+        age:  stage==='chatSolo'?ageSolo : (stage==='chatA'?ageA:ageB),
+        inputs:[msg]
       })
     });
     if (!res.ok) throw new Error(await res.text());
     const { reply } = await res.json();
 
-    if (stage === 'chatSolo') historySolo.push({ role:'assistant', content: reply });
-    else if (stage === 'chatA') historyA.push({ role:'assistant', content: reply });
-    else if (stage === 'chatB') historyB.push({ role:'assistant', content: reply });
+    if (stage==='chatSolo') historySolo.push({role:'assistant',content:reply});
+    else if (stage==='chatA') historyA.push({role:'assistant',content:reply});
+    else historyB.push({role:'assistant',content:reply});
 
-    addAdlerMessage(reply);
-  } catch (err) {
-    console.error('Chat error:', err);
+    addMsg(reply, false);
+
+  } catch(err) {
+    console.error(err);
     alert('Error during chat. Check console.');
   }
+}
+
+// bind Enter and sendIcon
+inputA.addEventListener('keydown', e=>{
+  if(e.key==='Enter'&&!e.shiftKey){
+    e.preventDefault(); sendMessage();
+  }
+});
+sendIcon.addEventListener('click', sendMessage);
+
+// Selection
+soloBtn.addEventListener('click',()=>{
+  sessionType='individual'; stage='infoSolo';
+  infoTitle.textContent='Solo Session — Your Info';
+  nameInput.value=sessionStorage.getItem('name')||'';
+  ageInput.value =sessionStorage.getItem('age') ||'';
+  showScreen(infoScreen);
+});
+dualBtn.addEventListener('click',()=>{
+  sessionType='dual'; stage='infoA';
+  infoTitle.textContent='Dual Session — User A Info';
+  nameInput.value=sessionStorage.getItem('nameA')||'';
+  ageInput.value =sessionStorage.getItem('ageA') ||'';
+  showScreen(infoScreen);
 });
 
-// ─── CHAT “FINISH” ───────────────────────────
-finishBtn.addEventListener('click', async () => {
+// Info→Chat
+infoNextBtn.addEventListener('click',()=>{
+  const nm=nameInput.value.trim(), ag=ageInput.value.trim();
+  if(!nm||!ag) return alert('Enter name & age.');
+  if(stage==='infoSolo'){
+    nameSolo=nm; ageSolo=ag; historySolo=[];
+    sessionStorage.setItem('name',nm);
+    sessionStorage.setItem('age',ag);
+    stage='chatSolo';
+  } else if(stage==='infoA'){
+    nameA=nm; ageA=ag; historyA=[];
+    sessionStorage.setItem('nameA',nm);
+    sessionStorage.setItem('ageA',ag);
+    stage='chatA';
+  } else {
+    nameB=nm; ageB=ag; historyB=[];
+    sessionStorage.setItem('nameB',nm);
+    sessionStorage.setItem('ageB',ag);
+    stage='chatB';
+  }
+  sessionTitle.textContent =
+    stage==='chatSolo'?`Solo Session for ${nameSolo}`:
+    stage==='chatA'   ?`Session — ${nameA}`:
+                       `Session — ${nameB}`;
+  chatLog.textContent=''; inputA.value='';
+  showScreen(chatScreen);
+});
+
+// Finish→Report
+finishBtn.addEventListener('click',async()=>{
   try {
-    if (sessionType==='individual' && stage==='chatSolo') {
-      const res = await fetch('http://localhost:3000/api/report', {
-        method:'POST',
-        headers:{ 'Content-Type':'application/json' },
-        body: JSON.stringify({
-          sessionType,
-          history: historySolo,
-          name: nameSolo,
-          age: ageSolo
-        })
-      });
-      if (!res.ok) throw new Error(await res.text());
-      const { report } = await res.json();
-      reportLog.innerHTML = renderReport(report);
-      showScreen(reportScreen);
-
-    } else if (sessionType==='dual' && stage==='chatA') {
-      stage = 'infoB';
-      infoTitle.textContent = 'Dual Session — User B Info';
-      nameInput.value = ageInput.value = '';
+    let payload;
+    if(sessionType==='individual'&&stage==='chatSolo'){
+      payload={sessionType,history:historySolo,name:nameSolo,age:ageSolo};
+    } else if(sessionType==='dual'&&stage==='chatA'){
+      stage='infoB';
+      infoTitle.textContent='Dual Session — User B Info';
+      nameInput.value=sessionStorage.getItem('nameB')||'';
+      ageInput.value =sessionStorage.getItem('ageB') ||'';
       showScreen(infoScreen);
-
-    } else if (sessionType==='dual' && stage==='chatB') {
-      const combined = [...historyA, ...historyB];
-      const res = await fetch('http://localhost:3000/api/report', {
-        method:'POST',
-        headers:{ 'Content-Type':'application/json' },
-        body: JSON.stringify({
-          sessionType,
-          history: combined,
-          nameA, ageA,
-          nameB, ageB
-        })
-      });
-      if (!res.ok) throw new Error(await res.text());
-      const { report } = await res.json();
-      reportLog.innerHTML = renderReport(report);
-      showScreen(reportScreen);
+      return;
+    } else {
+      const combined=[...historyA,...historyB];
+      payload={sessionType,history:combined,nameA,ageA,nameB,ageB};
     }
-  } catch (err) {
-    console.error('Report error:', err);
+    const res=await fetch('http://localhost:3000/api/report',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(payload)
+    });
+    if(!res.ok)throw new Error(await res.text());
+    const {report}=await res.json();
+    reportLog.innerHTML=renderReport(report);
+    showScreen(reportScreen);
+
+  } catch(e){
+    console.error(e);
     alert('Unable to generate report.');
   }
 });
 
-// ─── NAVIGATION ─────────────────────────────
-backBtn.addEventListener('click', () => showScreen(selScreen));
-newSessionBtn.addEventListener('click', () => {
-  sessionType = stage = null;
-  nameSolo = ageSolo = historySolo = [];
-  nameA = ageA = historyA = [];
-  nameB = ageB = historyB = [];
+// Download PDF
+downloadBtn.addEventListener('click',()=>{
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  const text = reportLog.innerText;
+  const lines = doc.splitTextToSize(text, 180);
+  doc.text(lines, 10, 10);
+  doc.save('Therapy_Report.pdf');
+});
+
+// Navigation
+backBtn.addEventListener('click',()=>showScreen(selScreen));
+newSessionBtn.addEventListener('click',()=>{
+  sessionStorage.clear();
   showScreen(selScreen);
 });
