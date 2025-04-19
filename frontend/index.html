@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Mind Matter</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- fixed top‑right title -->
+  <header class="site-header">Mind Matter</header>
+
+  <!-- SCREEN 1: Welcome / Selection -->
+  <div id="selectionScreen" class="screen">
+    <h2 class="welcome">Welcome to <span class="teal">Adler</span></h2>
+    <p class="subtitle">
+      Adler is a virtual therapist, powered by AI, that is here to help you.
+    </p>
+    <div class="btn-group">
+      <button id="soloBtn">Solo Session</button>
+      <button id="dualBtn">Dual Session</button>
+    </div>
+  </div>
+
+  <!-- SCREEN 2: Enter Name & Age -->
+  <div id="infoScreen" class="screen" style="display:none;">
+    <h2 id="infoTitle"></h2>
+    <input type="text" id="nameInput" placeholder="Your Name" />
+    <input type="number" id="ageInput" placeholder="Your Age" min="1" />
+    <button id="infoNextBtn">Next</button>
+  </div>
+
+  <!-- SCREEN 3: Chat Interface -->
+  <div id="chatScreen" class="screen" style="display:none;">
+    <button id="backBtn" class="back-btn">← Back</button>
+    <h2 id="sessionTitle"></h2>
+    <div id="chatLog" class="chat-log"></div>
+    <div class="input-area">
+      <textarea id="inputA" placeholder="Your message…"></textarea>
+      <button id="sendBtn">Send</button>
+      <button id="finishBtn">Finish</button>
+    </div>
+  </div>
+
+  <!-- SCREEN 4: Final Report -->
+  <div id="reportScreen" class="screen" style="display:none;">
+    <h2>Therapy Report</h2>
+    <div id="reportLog" class="report-box"></div>
+    <button id="newSessionBtn">New Session</button>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

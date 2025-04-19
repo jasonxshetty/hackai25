@@ -1,0 +1,139 @@
+/* body + fixed header */
+body {
+    margin: 0;
+    padding-top: 60px; /* space for header */
+    background: #e0f2f1; /* light teal */
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+  }
+  
+  /* site header: top‑right, bigger, bold, teal */
+  .site-header {
+    position: fixed;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 0.5rem 1rem;
+    font-size: 3rem;
+    font-weight: bold;
+    color: teal;
+    
+    z-index: 1000;
+  }
+  
+  /* container “card” — made wider */
+  .screen {
+    background: #fff;
+    width: 95%;
+    max-width: 1000px;   /* increased from 800px */
+    margin: 2rem auto;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    border-radius: 8px;
+  }
+  
+  /* Welcome screen text */
+  .welcome {
+    color: #333;
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+  }
+  .subtitle {
+    color: #666;
+    font-size: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  .teal { color: teal; }
+  
+  .btn-group button {
+    background: #008080;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 0.6rem 1rem;
+    cursor: pointer;
+    font-size: 1rem;
+    margin-right: 0.5rem;
+  }
+  .btn-group button:hover {
+    background: #006766;
+  }
+  
+  /* Back button */
+  .back-btn {
+    background: #fff;
+    color: #008080;
+    border: 1px solid #008080;
+    margin-bottom: 1rem;
+  }
+  
+  /* Inputs & textareas */
+  input, textarea {
+    width: 100%;
+    padding: 0.6rem;
+    margin: 0.5rem 0;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  
+  /* Chat log box */
+  .chat-log {
+    background: #f4f4f4;
+    padding: 1rem;
+    height: 300px;
+    overflow-y: auto;
+    overflow-x: hidden;      /* prevent horizontal scroll */
+    margin-bottom: 1rem;
+    border-radius: 4px;
+  }
+  
+  /* Report box: vertical‐only scroll */
+  .report-box {
+    background: #f4f4f4;
+    padding: 1rem;
+    height: 400px;
+    overflow-y: auto;
+    overflow-x: hidden;      /* lock horizontal */
+    white-space: pre-wrap;   /* wrap long lines */
+    border-radius: 4px;
+    margin-bottom: 1rem;
+  }
+  
+  /* Chat entries */
+  .chat-msg {
+    margin: 0.5rem 0;
+  }
+  .chat-msg strong {
+    font-weight: bold;
+  }
+  .user-msg strong {
+    color: teal;
+  }
+  .adler-msg strong {
+    color: black;
+  }
+  
+  /* Chat input area */
+  .input-area {
+    display: flex;
+    flex-direction: column;
+  }
+  .input-area textarea {
+    height: 70px;
+    resize: vertical;
+  }
+  .input-area button {
+    background: #008080;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 0.6rem 1rem;
+    cursor: pointer;
+    font-size: 1rem;
+    margin-top: 0.5rem;
+  }
+  .input-area button:hover {
+    background: #006766;
+  }
