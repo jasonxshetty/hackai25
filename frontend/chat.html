@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>MindMatch — Chat</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="site-header">
+    <a href="index.html">MindMatch</a>
+  </header>
+
+  <div class="screen">
+    <h2 id="sessionTitle"></h2>
+
+    <!-- UPLOAD for solo only -->
+    <div id="uploadSection" style="display:none; margin-bottom:1.5rem;">
+      <label for="fileInput">Upload transcript (TXT):</label>
+      <input type="file" id="fileInput" accept=".txt,.log" />
+    </div>
+
+    <div id="chatLog" class="chat-log"></div>
+
+    <div class="input-area">
+      <div class="textarea-container">
+        <textarea id="inputA" placeholder="Your message…"></textarea>
+        <button id="sendIcon" class="send-icon">➤</button>
+      </div>
+      <button id="finishBtn">Finish</button>
+      <button id="backBtn" class="back-btn">← Back</button>
+    </div>
+  </div>
+
+  <script>
+  (function(){
+    const params      = new URLSearchParams(location.search);
+    const stage       = params.get('stage');            // "solo","A","B"
+    const sessionType = sessionStorage.getItem('sessionType');
+
+    // === load user info ===
+    let name, age;
+    if (sessionType==='individual' && stage==='solo') {
+      name = sessionStorage.getItem('name');
+      age  = sessionStorage.getItem('age');
+    } else if (stage==='A') {
+      name = sessionStorage.getItem('nameA');
+      age  = sessionStorage.getItem('ageA');
+    } else {
+      name = sessionStorage.getItem('nameB');
+      age  = sessionStorage.getItem('ageB');
+    }
+
+    // === set title ===
+    document.getElementById('sessionTitle').textContent =
+      sessionType==='individual'
+        ? `Solo Session for ${name}`
+        : `Dual Session — ${stage}: ${name}`;
+
+    // === show upload only for solo ===
+    if (sessionType==='individual') {
+      document.getElementById('uploadSection').style.display = 'block';
+    }
+
+    // === store logs on file select ===
+    document.getElementById('fileInput').addEventListener('change', async e => {
+      const file = e.target.files[0];
+      if (!file) return;
+      sessionStorage.setItem('logData', await file.text());
+      alert('Transcript loaded ✅');
+    });
+
+    // === chat history state ===
+    let history = JSON.parse(
+      sessionStorage.getItem(
+        sessionType==='individual'
+          ? 'historySolo'
+          : (stage==='A' ? 'historyA' : 'historyB')
+      ) || '[]'
+    );
+
+    const chatLog = document.getElementById('chatLog');
+    function addMsg(txt, isUser){
+      const p = document.createElement('p');
+      p.className = 'chat-msg ' + (isUser?'user-msg':'adler-msg');
+      chatLog.appendChild(p);
+      if (!isUser) {
+        // typewriter
+        let i=0;
+        const iv = setInterval(()=>{
+          p.textContent += txt.charAt(i++);
+          chatLog.scrollTop = chatLog.scrollHeight;
+          if (i>=txt.length) clearInterval(iv);
+        },20);
+      } else {
+        p.textContent = txt;
+        chatLog.scrollTop = chatLog.scrollHeight;
+      }
+    }
+
+    // === send message ===
+    async function sendMessage(){
+      const inp = document.getElementById('inputA');
+      const msg = inp.value.trim();
+      if (!msg) return;
+      inp.value = '';
+      addMsg(msg,true);
+      history.push({ role:'user', content: msg });
+      sessionStorage.setItem(
+        sessionType==='individual' ? 'historySolo'
+        : (stage==='A'?'historyA':'historyB'),
+        JSON.stringify(history)
+      );
+
+      const res = await fetch('http://localhost:3000/api/chat',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ sessionType, name, age, inputs:[msg] })
+      });
+      const { reply } = await res.json();
+      addMsg(reply,false);
+      history.push({ role:'assistant', content: reply });
+      sessionStorage.setItem(
+        sessionType==='individual' ? 'historySolo'
+        : (stage==='A'?'historyA':'historyB'),
+        JSON.stringify(history)
+      );
+    }
+
+    document.getElementById('sendIcon').onclick = sendMessage;
+    document.getElementById('inputA')
+      .addEventListener('keydown', e => {
+        if (e.key==='Enter' && !e.shiftKey) {
+          e.preventDefault(); sendMessage();
+        }
+      });
+
+    // === Finish button routing ===
+    document.getElementById('finishBtn').onclick = () => {
+      if (sessionType==='dual' && stage==='A') {
+        // after chat A → B info
+        window.location = 'info.html?stage=B';
+      } else {
+        // after solo or after chat B → report
+        window.location = 'report.html';
+      }
+    };
+
+    // === Back button ===
+    document.getElementById('backBtn').onclick = () => history.back();
+
+  })();
+  </script>
+</body>
+</html>

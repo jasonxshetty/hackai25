@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>MindMatch — Your Info</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="site-header">
+    <a href="index.html">MindMatch</a>
+  </header>
+
+  <div class="screen">
+    <h2 id="infoTitle"></h2>
+    <input type="text"   id="nameInput" placeholder="Your Name" />
+    <input type="number" id="ageInput"  placeholder="Your Age"  min="1" />
+    <button id="infoNextBtn">Next</button>
+  </div>
+
+  <script>
+    // === determine stage & session type ===
+    const params      = new URLSearchParams(location.search);
+    const stage       = params.get('stage');      // "solo", "A", or "B"
+    const sessionType = sessionStorage.getItem('sessionType');
+
+    // === set the heading ===
+    const titleEl = document.getElementById('infoTitle');
+    if (sessionType==='individual' && stage==='solo') {
+      titleEl.textContent = 'Solo Session — Your Info';
+    } else if (sessionType==='dual' && stage==='A') {
+      titleEl.textContent = 'Dual Session — User A Info';
+    } else {
+      titleEl.textContent = 'Dual Session — User B Info';
+    }
+
+    // === on Next click ===
+    document.getElementById('infoNextBtn').onclick = () => {
+      const name = document.getElementById('nameInput').value.trim();
+      const age  = document.getElementById('ageInput').value.trim();
+      if (!name || !age) return alert('Please enter both name and age.');
+
+      if (sessionType==='individual') {
+        // store & go to solo chat
+        sessionStorage.setItem('name', name);
+        sessionStorage.setItem('age',  age);
+        window.location = 'chat.html?stage=solo';
+
+      } else {
+        if (stage==='A') {
+          // after A info → go to chat A
+          sessionStorage.setItem('nameA', name);
+          sessionStorage.setItem('ageA',  age);
+          window.location = 'chat.html?stage=A';
+
+        } else {
+          // after B info → go to chat B
+          sessionStorage.setItem('nameB', name);
+          sessionStorage.setItem('ageB',  age);
+          window.location = 'chat.html?stage=B';
+        }
+      }
+    };
+  </script>
+</body>
+</html>

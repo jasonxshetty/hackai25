@@ -1,12 +1,18 @@
-/* BODY + HEADER */
-body {
+:root {
+    --primary:   #42828F;   /* main accent (Adler, buttons, etc.) */
+    --secondary: #11515E;   /* darker teal, now page background */
+  }
+  
+  /* BODY + HEADER */
+  body {
     margin: 0;
     padding-top: 100px;
-    background: #cde5e4; /* consistent light‑teal */
+    background: var(--secondary);   /* darker teal page background */
     font-family: Arial, sans-serif;
     display: flex;
     justify-content: center;
   }
+  
   .site-header {
     position: fixed;
     top: 20px; left: 50%;
@@ -21,9 +27,23 @@ body {
     text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
   }
   
+  /* SPLASH SCREEN */
+  .splash-screen {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: #333;
+    font-family: 'Courier New', Courier, monospace;
+    z-index: 2000;
+  }
+  
   /* SCREEN CONTAINER */
   .screen {
-    background: #fff;
+    background: #fff;  /* panels stay white */
     width: 95%;
     max-width: 1000px;
     margin: 2rem auto;
@@ -33,9 +53,19 @@ body {
   }
   
   /* WELCOME TEXT */
-  .welcome { color: #333; font-size: 2rem; margin-bottom: .5rem; }
-  .subtitle { color: #666; font-size: 1rem; margin-bottom: 1.5rem; }
-  .teal    { color: teal; }
+  .welcome {
+    color: #333;       /* dark text for readability */
+    font-size: 2rem;
+    margin-bottom: .5rem;
+  }
+  .subtitle {
+    color: #666;       /* muted dark for subtitle */
+    font-size: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  .teal {
+    color: var(--primary);  /* Adler remains in primary */
+  }
   
   /* SELECTION GRID */
   .selection-grid {
@@ -64,44 +94,58 @@ body {
   
   .selection-card button {
     position: absolute; bottom: 20px;
-    background: #4f9999; color: #fff;
-    border: none; border-radius: 6px;
-    padding: .6rem 1.2rem; font-size: 1.05rem;
-    font-weight: 500; cursor: pointer;
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: .6rem 1.2rem;
+    font-size: 1.05rem;
+    font-weight: 500;
+    cursor: pointer;
     box-shadow: 0 2px 6px rgba(0,0,0,0.15);
     transition: transform .2s, background .2s;
   }
   .selection-card button:hover {
-    background: #2e7c7c;
+    background: var(--secondary);
     transform: scale(1.05);
   }
   
   /* INFO SCREEN “Next” */
   #infoNextBtn {
-    background: #008080; color: #fff;
+    background: var(--primary);
+    color: #fff;
     border: none; border-radius: 4px;
     padding: .8rem 1rem; font-size: 1rem;
-    cursor: pointer; margin-top: 1rem;
+    cursor: pointer;
+    display: block;
+    margin: 1.5rem auto 0 auto;
   }
-  #infoNextBtn:hover { background: #006766; }
+  #infoNextBtn:hover {
+    background: var(--secondary);
+  }
   
   /* BACK BUTTON */
   .back-btn {
-    background: #fff; color: #008080;
-    border: 1px solid #008080; border-radius: 4px;
-    padding: .4rem .8rem; margin-bottom: 1rem;
+    background: #fff;
+    color: var(--primary);
+    border: 1px solid var(--primary);
+    border-radius: 4px;
+    padding: .4rem .8rem;
+    margin-top: .5rem;
     cursor: pointer;
+    display: block;
+    margin-left: auto; margin-right: auto;
   }
-  .back-btn:hover { background: #f0f0f0; }
+  .back-btn:hover {
+    background: #f0f0f0;
+  }
   
-  /* INPUT STYLES */
+  /* INPUT & CHAT */
   input, textarea {
     width: 100%; padding: .6rem; margin: .5rem 0;
     font-size: 1rem; border: 1px solid #ccc;
     border-radius: 4px;
   }
-  
-  /* CHAT LOG BUBBLES */
   .chat-log {
     display: flex; flex-direction: column; gap: .5rem;
     margin-bottom: 1rem; max-height: 300px; overflow-y: auto;
@@ -109,54 +153,47 @@ body {
   .chat-msg {
     max-width: 70%; padding: .75rem 1rem; border-radius: 12px;
     line-height: 1.4; word-break: break-word;
-    position: relative;
   }
-  .adler-msg {
-    align-self: flex-start;
-    background: #f4f4f4; color: #000;
-  }
-  .user-msg {
-    align-self: flex-end;
-    background: #008080; color: #fff;
-  }
+  .adler-msg { align-self: flex-start; background: #f4f4f4; color: #000; }
+  .user-msg  { align-self: flex-end; background: var(--primary); color: #fff; }
   
   /* INPUT AREA & SEND ICON */
-  .input-area {
-    display: flex; flex-direction: column; gap: .75rem;
-  }
-  .textarea-container {
-    position: relative;
-  }
+  .input-area { display: flex; flex-direction: column; gap: .75rem; }
+  .textarea-container { position: relative; }
+  textarea { padding-right: 60px; }
   .send-icon {
-    position: absolute;
-    bottom: 12px; right: 12px;
-    background: none; border: none;
-    color: #666; font-size: 1.2rem;
-    cursor: pointer;
-    opacity: .7;
-    transition: opacity .2s;
+    position: absolute; bottom: 12px; right: 12px;
+    width: 40px; height: 40px;
+    background: var(--primary); color: #fff;
+    border: none; border-radius: 6px;
+    font-size: 1.25rem;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: background .2s;
   }
-  .send-icon:hover { opacity: 1; }
+  .send-icon:hover {
+    background: var(--secondary);
+  }
   
+  /* FINISH BUTTON */
   .input-area button {
-    background: #008080; color: #fff;
+    background: var(--primary);
+    color: #fff;
     border: none; border-radius: 4px;
     padding: .75rem; font-size: 1rem; cursor: pointer;
   }
-  .input-area button:hover { background: #006766; }
+  .input-area button:hover {
+    background: var(--secondary);
+  }
   
   /* REPORT BOX */
   .report-box {
-    background: #f4f4f4; padding: 1rem;
-    max-height: 400px; overflow-y: auto;
-    white-space: pre-wrap; border-radius: 4px;
+    background: #f4f4f4; padding: 1rem; max-height: 400px;
+    overflow-y: auto; white-space: pre-wrap; border-radius: 4px;
     margin-bottom: 1rem;
   }
-  /* Bold headers, clean lists */
   .report-box h3 {
-    margin: 1rem 0 .5rem;
-    font-size: 1.25rem; font-weight: bold;
-    color: #00695c;
+    margin: 1rem 0 .5rem; font-size: 1.25rem;
+    font-weight: bold; color: #00695c;
   }
   .report-box p {
     margin: .5rem 0; line-height: 1.5; color: #333;
@@ -168,14 +205,28 @@ body {
     margin: .4rem 0; line-height: 1.5;
   }
   
+  /* Threat Risk Score Circles */
+  .report-box .tfs-circles {
+    display: flex; gap: 6px; margin-bottom: 1rem;
+  }
+  .report-box .tfs-circles .circle {
+    width: 16px; height: 16px; border-radius: 50%; background: #ccc;
+  }
+  .report-box .tfs-circles .green  { background: #4caf50; }
+  .report-box .tfs-circles .orange { background: #ff9800; }
+  .report-box .tfs-circles .red    { background: #f44336; }
+  
   /* REPORT BUTTONS */
   .report-buttons {
     display: flex; gap: 1rem;
   }
   .report-buttons button {
-    background: #008080; color: #fff;
+    background: var(--primary);
+    color: #fff;
     border: none; border-radius: 4px;
-    padding: .75rem 1rem; font-size: 1rem;
-    cursor: pointer; transition: background .2s;
+    padding: .75rem 1rem; font-size: 1rem; cursor: pointer;
+    transition: background .2s;
   }
-  .report-buttons button:hover { background: #006766; }
+  .report-buttons button:hover {
+    background: var(--secondary);
+  }

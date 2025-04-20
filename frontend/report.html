@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>MindMatch — Report</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- looping typewriter splash -->
+  <div id="splash" class="splash-screen">Wrapping things up...</div>
+
+  <header class="site-header">
+    <a href="index.html">MindMatch</a>
+  </header>
+
+  <div id="reportScreen" class="screen" style="display:none;">
+    <h2>Report</h2>
+    <div id="reportLog" class="report-box"></div>
+    <div class="report-buttons">
+      <button id="downloadBtn">Download PDF</button>
+      <button id="newSessionBtn">New Session</button>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script>
+  (async () => {
+    // 1) Splash typewriter loop
+    const splashEl = document.getElementById('splash');
+    const text = splashEl.textContent;
+    function animateSplash() {
+      let i = 0;
+      splashEl.textContent = '';
+      const iv = setInterval(() => {
+        splashEl.textContent += text.charAt(i++);
+        if (i >= text.length) {
+          clearInterval(iv);
+          setTimeout(animateSplash, 500);
+        }
+      }, 75);
+    }
+    animateSplash();
+
+    // 2) Renderer
+    function renderReport(md) {
+      md = md.replace(/\*/g, '');
+      const lines = md.split('\n').filter(l=>l.trim());
+      let items = [], html = [];
+      for (let l of lines) {
+        // TFS
+        const tfs = l.match(/^TFS:\s*([\d.\/]+)/i);
+        if (tfs) {
+          html.push(`<h3><strong>Threat Risk Score: ${tfs[1]}</strong></h3>`);
+          continue;
+        }
+        // Header
+        const h = l.match(/^#+\s+(.*)/);
+        if (h) {
+          html.push(`<h3>${h[1]}</h3>`);
+          continue;
+        }
+        // List
+        const n = l.match(/^\d+\.\s+(.*)/);
+        if (n) {
+          items.push(n[1]);
+          continue;
+        }
+        // Flush
+        if (items.length) {
+          html.push('<ol>' + items.map(i=>`<li>${i}</li>`).join('') + '</ol>');
+          items = [];
+        }
+        // Paragraph
+        html.push(`<p>${l}</p>`);
+      }
+      if (items.length) {
+        html.push('<ol>' + items.map(i=>`<li>${i}</li>`).join('') + '</ol>');
+      }
+      return html.join('');
+    }
+
+    // 3) Gather & send
+    const sessionType = sessionStorage.getItem('sessionType');
+    const historySolo = JSON.parse(sessionStorage.getItem('historySolo')||'[]');
+    const historyA    = JSON.parse(sessionStorage.getItem('historyA')   ||'[]');
+    const historyB    = JSON.parse(sessionStorage.getItem('historyB')   ||'[]');
+    const name        = sessionStorage.getItem('name');
+    const age         = sessionStorage.getItem('age');
+    const nameA       = sessionStorage.getItem('nameA');
+    const ageA        = sessionStorage.getItem('ageA');
+    const nameB       = sessionStorage.getItem('nameB');
+    const ageB        = sessionStorage.getItem('ageB');
+    const logs        = sessionStorage.getItem('logData') || '';
+
+    let payload = {};
+    if (sessionType==='individual') {
+      payload = { sessionType, name, age, history: historySolo };
+    } else {
+      payload = {
+        sessionType,
+        nameA, ageA,
+        nameB, ageB,
+        history: [...historyA, ...historyB]
+      };
+    }
+    if (logs) payload.logs = logs;
+
+    const res = await fetch('http://localhost:3000/api/report', {
+      method:'POST',
+      headers:{ 'Content-Type':'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const { report } = await res.json();
+
+    // 4) Show report
+    splashEl.style.display = 'none';
+    document.getElementById('reportScreen').style.display = 'block';
+    const container = document.getElementById('reportLog');
+    container.innerHTML = renderReport(report);
+
+    // 5) TFS circles
+    const header = container.querySelector('h3');
+    if (header) {
+      const m = header.textContent.match(/(\d+(?:\.\d+)?)/);
+      if (m) {
+        const score = Math.round(parseFloat(m[1]));
+        const div = document.createElement('div');
+        div.className = 'tfs-circles';
+        for (let i=1; i<=10; i++) {
+          const c = document.createElement('div');
+          c.className = 'circle';
+          if (i<=score) {
+            if (i<=3)      c.classList.add('green');
+            else if (i<=7) c.classList.add('orange');
+            else           c.classList.add('red');
+          }
+          div.appendChild(c);
+        }
+        header.insertAdjacentElement('afterend', div);
+      }
+    }
+
+    // 6) Ensure every key section has content
+    const sections = [
+      'Summary of Emotional State',
+      'DSM-informed Findings',
+      'Risk Flags',
+      'Actionable Next Steps'
+    ];
+    sections.forEach(title => {
+      const hdr = Array.from(container.querySelectorAll('h3'))
+        .find(h => h.textContent.trim().startsWith(title));
+      if (hdr) {
+        let el = hdr.nextElementSibling;
+        if (!el || el.tagName==='H3') {
+          const p = document.createElement('p');
+          p.textContent = {
+            'Summary of Emotional State': 'No summary available.',
+            'DSM-informed Findings':       'No DSM-informed findings identified.',
+            'Risk Flags':                  'No risk flags identified.',
+            'Actionable Next Steps':       'No next steps suggested.'
+          }[title];
+          hdr.insertAdjacentElement('afterend', p);
+        }
+      }
+    });
+
+    // 7) PDF & reset
+    document.getElementById('downloadBtn').onclick = () => {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      const text = container.innerText;
+      const lines = doc.splitTextToSize(text, 180);
+      doc.text(lines, 10, 10);
+      doc.save('Therapy_Report.pdf');
+    };
+    document.getElementById('newSessionBtn').onclick = () => {
+      sessionStorage.clear();
+      window.location = 'index.html';
+    };
+  })();
+  </script>
+</body>
+</html>

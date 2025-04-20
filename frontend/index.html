@@ -2,22 +2,22 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Mind Matter</title>
+  <title>MindMatch</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <header class="site-header">
-    <a href="#" id="homeLink">Mind Matter</a>
+    <a href="index.html">MindMatch</a>
   </header>
 
-  <!-- SCREEN 1: Welcome / Selection -->
-  <div id="selectionScreen" class="screen">
+  <div class="screen">
     <h2 class="welcome">
       Welcome to <span class="teal">Adler</span>,
     </h2>
     <p class="subtitle">
       Adler is a virtual therapist, powered by AI, that is here to help you.
     </p>
+
     <div class="selection-grid">
       <div class="selection-card" id="soloCard">
         <button id="soloBtn">Solo Session</button>
@@ -28,39 +28,17 @@
     </div>
   </div>
 
-  <!-- SCREEN 2: Enter Name & Age -->
-  <div id="infoScreen" class="screen" style="display:none;">
-    <h2 id="infoTitle"></h2>
-    <input type="text"   id="nameInput" placeholder="Your Name" />
-    <input type="number" id="ageInput"  placeholder="Your Age"  min="1" />
-    <button id="infoNextBtn">Next</button>
-  </div>
-
-  <!-- SCREEN 3: Chat Interface -->
-  <div id="chatScreen" class="screen" style="display:none;">
-    <button id="backBtn" class="back-btn">← Back</button>
-    <h2 id="sessionTitle"></h2>
-    <div id="chatLog" class="chat-log"></div>
-    <div class="input-area">
-      <div class="textarea-container">
-        <textarea id="inputA" placeholder="Your message…"></textarea>
-        <button id="sendIcon" class="send-icon">➤</button>
-      </div>
-      <button id="finishBtn">Finish</button>
-    </div>
-  </div>
-
-  <!-- SCREEN 4: Final Report -->
-  <div id="reportScreen" class="screen" style="display:none;">
-    <h2>Therapy Report</h2>
-    <div id="reportLog" class="report-box"></div>
-    <div class="report-buttons">
-      <button id="downloadBtn">Download PDF</button>
-      <button id="newSessionBtn">New Session</button>
-    </div>
-  </div>
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="script.js"></script>
+  <script>
+    document.getElementById('soloBtn').onclick = () => {
+      sessionStorage.setItem('sessionType','individual');
+      // for individual we jump straight to info, stage=solo
+      window.location = 'info.html?stage=solo';
+    };
+    document.getElementById('dualBtn').onclick = () => {
+      sessionStorage.setItem('sessionType','dual');
+      // for dual we first collect A’s info
+      window.location = 'info.html?stage=A';
+    };
+  </script>
 </body>
 </html>
